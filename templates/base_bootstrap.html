@@ -33,7 +33,7 @@
             </div>
 
             <nav class="sidebar-nav">
-                {% if user.tipo_usuario == "Admin" %}
+                {% if user.tipo_usuario == "Admin" or user.tipo_usuario == "Administrador" %}
                 <div class="sidebar-section">
                     <div class="sidebar-section-title">Principal</div>
                     <a href="/dashboard" class="sidebar-item {% if request.url.path == '/dashboard' %}active{% endif %}">
@@ -55,6 +55,10 @@
                     <a href="/admin/categorias" class="sidebar-item {% if request.url.path == '/admin/categorias' %}active{% endif %}">
                         <i class="bi bi-tag"></i>
                         <span>Categorias</span>
+                    </a>
+                    <a href="/admin/lancamentos" class="sidebar-item {% if request.url.path == '/admin/lancamentos' %}active{% endif %}">
+                        <i class="bi bi-clock-history"></i>
+                        <span>Lançamentos da Equipe</span>
                     </a>
                     <a href="/admin/sharepoint" class="sidebar-item {% if request.url.path == '/admin/sharepoint' %}active{% endif %}">
                         <i class="bi bi-cloud-arrow-up"></i>

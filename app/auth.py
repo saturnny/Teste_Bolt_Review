@@ -21,16 +21,20 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return pwd_context.hash(password)
 
-def get_user_by_email(db: Session, email: str):
-    return db.query(User).filter(User.email == email).first()
-
 def authenticate_user(db: Session, email: str, password: str):
-    user = get_user_by_email(db, email)
+    from .crud import get_user_by_email
+    print(f"DEBUG: authenticate_user for email: {email}", flush=True)
+    user = get_user_by_email(db, email=email)
     if not user:
+        print(f"DEBUG: User not found for email: {email}", flush=True)
         return False
-    if not verify_password(password, user.senha):
+    print(f"DEBUG: User found: {user.email}, verifying password...", flush=True)
+    is_valid = verify_password(password, user.senha)
+    print(f"DEBUG: Password valid: {is_valid}", flush=True)
+    if not is_valid:
         return False
     return user
+
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
@@ -63,13 +67,15 @@ async def get_current_user(request: Request, db: Session = Depends(get_db)):
     
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: str = payload.get("sub")
-        if user_id is None:
+        user_id_str = payload.get("sub")
+        if user_id_str is None:
             raise credentials_exception
-    except JWTError:
+        user_id = int(user_id_str)
+    except (JWTError, ValueError):
         raise credentials_exception
     
-    user = db.query(User).filter(User.id == user_id).first()
+    from .crud import get_user
+    user = get_user(db, user_id=user_id)
     if user is None:
         raise credentials_exception
     return user
@@ -80,7 +86,7 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
     return current_user
 
 def require_admin(current_user: User = Depends(get_current_active_user)):
-    if current_user.tipo_usuario != "Admin":
+    if current_user.tipo_usuario != "Administrador" and current_user.tipo_usuario != "Admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions"

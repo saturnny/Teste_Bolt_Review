@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Time, Date, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Time, Date, Boolean, Float
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from .database import Base
@@ -56,11 +56,4 @@ class Lancamento(Base):
     usuario = relationship("User", back_populates="lancamentos")
     atividade = relationship("Atividade", back_populates="lancamentos")
 
-    @property
-    def duracao_horas(self):
-        if self.hora_inicio and self.hora_fim:
-            inicio = datetime.combine(self.data, self.hora_inicio)
-            fim = datetime.combine(self.data, self.hora_fim)
-            diff = fim - inicio
-            return diff.total_seconds() / 3600
-        return 0
+    duracao_horas = Column(Float, nullable=True)
