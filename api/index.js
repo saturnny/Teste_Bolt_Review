@@ -65,5 +65,13 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Start local server if run directly (e.g. node api/index.js)
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Development server running on port ${PORT}`);
+  });
+}
+
 // Export for Vercel
 module.exports = app;
