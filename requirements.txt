@@ -1,2 +1,2 @@
-# Pure Python (no dependencies)
-# Alternative: starlette==0.27.0
+# Vercel Python Runtime - No dependencies needed for pure Python
+# This file is required but can be empty for pure Python functions
