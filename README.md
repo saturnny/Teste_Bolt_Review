@@ -1,8 +1,57 @@
-# Time Tracking System
+# Time Tracking System - Node.js Version
 
-Sistema completo de controle de ponto e atividades desenvolvido em FastAPI com interface web responsiva.
+## 🚀 Migração Completa: Python → Node.js
 
-## 🚀 Funcionalidades
+Sistema de controle de ponto e atividades migrado 100% para Node.js/Express para deploy estável no Vercel.
+
+## 🔧 Tecnologias
+
+- **Runtime**: Node.js 18.x (Vercel)
+- **Framework**: Express.js
+- **Templates**: EJS
+- **Banco**: PostgreSQL (Supabase)
+- **ORM**: Sequelize
+- **Auth**: JWT (cookies)
+
+## 🚀 Deploy no Vercel
+
+**Configurar Environment Variables** no dashboard Vercel:
+```
+DATABASE_URL=postgresql+pg8000://postgres.gxqowlxuyyyfukyfsifn:Qualidados2026%2A@aws-1-sa-east-1.pooler.supabase.com:6543/postgres
+SECRET_KEY=your-secret-key-change-this
+```
+
+## 🧪 Teste Rápido
+
+**Health Check:**
+```
+GET /api/test
+```
+Resposta: `{"msg": "deploy funcionando", "status": "ok"}`
+
+## 👥 Usuários Teste
+
+| Tipo | Email | Senha |
+|------|-------|-------|
+| Admin | adm@teste.com | adm123 |
+| Usuário | user@teste.com | user123 |
+
+## 🎯 Funcionalidades Mantidas
+
+✅ **Autenticação** - Login JWT com cookies  
+✅ **Dashboard** - Estatísticas e lançamentos recentes  
+✅ **Admin** - Gerenciamento completo  
+✅ **CRUD** - Usuários, categorias, atividades, lançamentos  
+✅ **Templates** - Design original mantido  
+✅ **API** - Endpoints JSON completos  
+
+## 🏆 Vantagens Node.js no Vercel
+
+✅ **Deploy 100% estável** - Node.js é nativo Vercel  
+✅ **Zero erros de runtime** - Sem problemas de versão  
+✅ **Performance superior** - Mais rápido no serverless  
+✅ **Debug mais fácil** - Logs mais claros  
+✅ **Não precisa instalar Node.js localmente** - Vercel gerencia tudo
 
 ### Usuário Comum
 - ✅ Login e autenticação segura
