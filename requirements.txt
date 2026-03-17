@@ -1,2 +1,11 @@
-# Vercel Python Runtime - Dependencies for serverless functions
+# Time Tracking System - Complete Dependencies
 python-dotenv==1.0.0
+fastapi==0.68.0
+uvicorn==0.15.0
+pydantic[email]==1.8.2
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
+python-multipart==0.0.5
+Jinja2==3.0.1
+SQLAlchemy==1.4.23
+pg8000==1.20.0
