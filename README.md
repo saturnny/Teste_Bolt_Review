@@ -15,11 +15,41 @@ Sistema de controle de ponto e atividades migrado 100% para Node.js/Express para
 
 ## 🚀 Deploy no Vercel
 
-**Configurar Environment Variables** no dashboard Vercel:
+### 1. Preparar o Projeto
+```bash
+# Verificar se está tudo pronto para deploy
+node prepare-deploy.js
 ```
-DATABASE_URL=postgresql+pg8000://postgres.gxqowlxuyyyfukyfsifn:Qualidados2026%2A@aws-1-sa-east-1.pooler.supabase.com:6543/postgres
-SECRET_KEY=your-secret-key-change-this
+
+### 2. Configurar Variáveis de Ambiente
+
+Configure estas variáveis no painel do Vercel (Settings > Environment Variables):
+
+```env
+# Banco de Dados
+DATABASE_URL=postgresql://postgres.wqcdytvuwoagaqhdgkfl:node@VersionHhMAIN@aws-1-sa-east-1.pooler.supabase.com:6543/postgres
+
+# Autenticação
+SECRET_KEY=sua-chave-secreta-muito-segura-aqui
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# Ambiente
+NODE_ENV=production
 ```
+
+### 3. Deploy Automático
+
+1. **Conecte o repositório GitHub** no Vercel
+2. **Configure as variáveis de ambiente** no painel
+3. **Faça deploy** automático a cada push
+
+### 4. URLs Pós-Deploy
+
+- **Aplicação**: `https://seu-projeto.vercel.app`
+- **Dashboard**: `https://seu-projeto.vercel.app/dashboard`
+- **Admin**: `https://seu-projeto.vercel.app/admin/usuarios`
+- **API Test**: `https://seu-projeto.vercel.app/api/test`
 
 ## 🧪 Teste Rápido
 

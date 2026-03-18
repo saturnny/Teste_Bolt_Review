@@ -1,9 +1,24 @@
 # Local Environment
 .env.local
+.env
 
 # Vercel Environment  
 .env.vercel
 
-# Git (não versionar)
-.env
-.env.*.local
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Runtime
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Build
+dist/
+build/
