@@ -2,10 +2,10 @@
  * Authentication API Routes
  * Next.js API Routes for authentication
  */
-import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { User } from '../../../app/models/database';
+const { NextResponse } = require('next/server');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { User } = require('../../../app/models/database');
 
 // JWT Secret
 const JWT_SECRET = process.env.SECRET_KEY || 'your-secret-key';
@@ -37,7 +37,7 @@ async function verifyToken(request) {
 }
 
 // POST /api/auth/token - Login
-export async function POST(request) {
+async function POST(request) {
   try {
     const { username, password } = await request.json();
     
@@ -94,7 +94,7 @@ export async function POST(request) {
 }
 
 // GET /api/auth/check - Check authentication status
-export async function GET(request) {
+async function GET(request) {
   try {
     const user = await verifyToken(request);
     
@@ -108,3 +108,5 @@ export async function GET(request) {
     return NextResponse.json({ error: 'Erro na autenticação' }, { status: 500 });
   }
 }
+
+module.exports = { POST, GET };

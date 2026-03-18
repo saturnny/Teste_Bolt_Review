@@ -2,15 +2,15 @@
  * Next.js Middleware
  * Protects authenticated routes
  */
-import { NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+const { NextResponse } = require('next/server');
+const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.SECRET_KEY || 'your-secret-key';
 
 // Paths that require authentication
 const protectedPaths = ['/dashboard', '/perfil', '/lancamentos', '/admin'];
 
-export function middleware(request) {
+module.exports = function middleware(request) {
   const { pathname } = request.nextUrl;
   
   // Check if the path requires authentication
@@ -40,9 +40,9 @@ export function middleware(request) {
   }
   
   return NextResponse.next();
-}
+};
 
-export const config = {
+module.exports.config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:

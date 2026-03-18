@@ -1,18 +1,18 @@
 {
-  "name": "time-tracking-system",
-  "version": "1.0.0",
-  "description": "Time Tracking System - Node.js Version",
-  "main": "api/index.js",
+  "name": "time-tracking-system-nextjs",
+  "version": "2.0.0",
+  "description": "Time Tracking System - Next.js Version",
+  "private": true,
   "scripts": {
-    "start": "node api/index.js",
-    "dev": "nodemon api/index.js",
-    "install-deps": "npm install",
-    "seed": "node seed_database.js",
-    "test-login": "node test_login.js"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "ejs": "^3.1.9",
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "sequelize": "^6.32.1",
     "pg": "^8.11.0",
     "jsonwebtoken": "^9.0.2",
@@ -20,10 +20,16 @@
     "joi": "^17.9.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "^14.0.0",
+    "typescript": "^5.0.0"
   },
   "engines": {
     "node": "24.x"

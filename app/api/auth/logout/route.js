@@ -2,10 +2,10 @@
  * Logout API Route
  * Next.js API Route for logout
  */
-import { NextResponse } from 'next/server';
+const { NextResponse } = require('next/server');
 
 // POST /api/auth/logout - Logout
-export async function POST(request) {
+async function POST(request) {
   try {
     const response = NextResponse.json({ success: true });
     response.cookies.delete('access_token');
@@ -17,6 +17,8 @@ export async function POST(request) {
 }
 
 // GET /api/auth/logout - Logout (for backward compatibility)
-export async function GET(request) {
+async function GET(request) {
   return POST(request);
 }
+
+module.exports = { POST, GET };

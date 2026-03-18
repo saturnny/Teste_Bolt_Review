@@ -2,9 +2,9 @@
  * Dashboard Stats API Route
  * Next.js API Route for dashboard statistics
  */
-import { NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
-import { User, Lancamento, Atividade, Categoria, sequelize } from '../../../../app/models/database';
+const { NextResponse } = require('next/server');
+const jwt = require('jsonwebtoken');
+const { User, Lancamento, Atividade, Categoria, sequelize } = require('../../../../app/models/database');
 
 // JWT Secret
 const JWT_SECRET = process.env.SECRET_KEY || 'your-secret-key';
@@ -36,7 +36,7 @@ async function verifyToken(request) {
 }
 
 // GET /api/dashboard/stats - Get dashboard statistics
-export async function GET(request) {
+async function GET(request) {
   try {
     const user = await verifyToken(request);
     
@@ -106,3 +106,5 @@ export async function GET(request) {
     return NextResponse.json({ error: 'Erro ao carregar estatísticas' }, { status: 500 });
   }
 }
+
+module.exports = { GET };
