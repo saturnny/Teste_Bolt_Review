@@ -1,0 +1,36 @@
+/* Importar CSS existente */
+@import url('../styles/bootstrap-theme.css');
+@import url('../styles/design-tokens.css');
+@import url('../styles/icons.css');
+@import url('../styles/components.css');
+@import url('../styles/style.css');
+@import url('../styles/time-picker.css');
+
+/* Reset básico para garantir compatibilidade */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Garantir que o layout do app funcione corretamente */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 280px;
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+  }
+}
