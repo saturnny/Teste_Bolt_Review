@@ -1,5 +1,7 @@
 <%- include('../header_bootstrap', {title: 'Gerenciar Usuários - ' + user.nome}) %>
 
+<!-- DEBUG: <%= typeof usuarios !== 'undefined' ? usuarios.length : 'undefined' %> usuários -->
+
 <div class="topbar">
     <div class="topbar-title">
         <h1 style="font-weight: 700; color: #333;">Gerenciamento de Usuários</h1>
@@ -192,7 +194,7 @@
                         <div class="col-md-6">
                             <label for="tipo_usuario" class="form-label">Tipo de Usuário *</label>
                             <select id="tipo_usuario" name="tipo_usuario" class="form-select" required>
-                                <option value="Usuario">Usuário</option>
+                                <option value="Usuário">Usuário</option>
                                 <option value="Admin">Administrador</option>
                             </select>
                         </div>

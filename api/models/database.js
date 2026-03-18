@@ -6,7 +6,7 @@ require('dotenv').config();
 const { Sequelize } = require('sequelize');
 
 // Database connection
-const sequelize = new Sequelize(process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/timetracking', {
+const sequelize = new Sequelize(process.env.DATABASE_URL || 'postgresql://postgres.wqcdytvuwoagaqhdgkfl:node@VersionHhMAIN@aws-1-sa-east-1.pooler.supabase.com:6543/postgres', {
   dialect: 'postgres',
   logging: process.env.NODE_ENV === 'development' ? console.log : false,
   pool: {
@@ -40,6 +40,18 @@ const User = sequelize.define('User', {
   tipo_usuario: {
     type: Sequelize.ENUM('Admin', 'Administrador', 'Usuário'),
     defaultValue: 'Usuário'
+  },
+  gestao: {
+    type: Sequelize.STRING
+  },
+  area: {
+    type: Sequelize.STRING
+  },
+  equipe: {
+    type: Sequelize.STRING
+  },
+  especialidade: {
+    type: Sequelize.STRING
   },
   ativo: {
     type: Sequelize.BOOLEAN,
@@ -152,6 +164,14 @@ const Lancamento = sequelize.define('Lancamento', {
   },
   hora_fim: {
     type: Sequelize.TIME
+  },
+  horas_trabalhadas: {
+    type: Sequelize.DECIMAL(4,2),
+    defaultValue: 0
+  },
+  horas_pendentes: {
+    type: Sequelize.DECIMAL(4,2),
+    defaultValue: 9
   },
   descricao: {
     type: Sequelize.TEXT

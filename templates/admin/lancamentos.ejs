@@ -52,8 +52,8 @@
                 <td><%= (lancamento.hora_inicio) ? lancamento.hora_inicio : '-' %></td>
                 <td><%= (lancamento.hora_fim) ? lancamento.hora_fim : '-' %></td>
                 <td><%= (lancamento.Atividade) ? lancamento.Atividade.nome : (lancamento.atividade ? lancamento.atividade.nome : '-') %></td>
-                <td><%= lancamento.observacao || '-' %></td>
-                <td><%= (lancamento.duracao_horas || 0).toFixed(1) %>h</td>
+                <td><%= (lancamento.descricao || '-') %></td>
+                <td><%= (lancamento.horas_trabalhadas || 0).toFixed(1) %>h</td>
             </tr>
             <% }); %>
         </tbody>
@@ -62,7 +62,7 @@
     <div style="margin-top: 2rem; padding: 1rem; background-color: #f8f9fa; border-radius: 5px;">
         <h4>Resumo</h4>
         <p><strong>Total de Lançamentos:</strong> <%= lancamentos.length %></p>
-        <p><strong>Total de Horas:</strong> <%= lancamentos.reduce((acc, curr) => acc + (parseFloat(curr.duracao_horas) || 0), 0).toFixed(1) %>h</p>
+        <p><strong>Total de Horas:</strong> <%= lancamentos.reduce((acc, curr) => acc + (parseFloat(curr.horas_trabalhadas) || 0), 0).toFixed(1) %>h</p>
     </div>
     <% } else { %>
     <div style="text-align: center; padding: 2rem; color: #666;">

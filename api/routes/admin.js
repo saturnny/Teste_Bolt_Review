@@ -27,9 +27,12 @@ router.get('/usuarios', adminAuth, async (req, res) => {
       order: [['nome', 'ASC']]
     });
     
+    console.log('DEBUG ADMIN USUÁRIOS - users.length:', users.length);
+    console.log('DEBUG ADMIN USUÁRIOS - users:', users.map(u => ({ id: u.id, nome: u.nome, email: u.email })));
+    
     res.render('admin/usuarios_bootstrap', {
       user: req.user,
-      users: users.map(u => u.toJSON()),
+      usuarios: users.map(u => u.toJSON()),
       title: 'Admin Usuários - Time Tracking'
     });
     
@@ -45,7 +48,9 @@ router.get('/usuarios', adminAuth, async (req, res) => {
 // Create User
 router.post('/usuarios', adminAuth, async (req, res) => {
   try {
-    const { nome, email, senha, tipo_usuario } = req.body;
+    const { nome, email, senha, tipo_usuario, gestao, area, equipe, especialidade } = req.body;
+    
+    console.log('DEBUG CREATE USER - req.body:', req.body);
     
     // Hash password
     const hashedPassword = await bcrypt.hash(senha, 10);
@@ -55,7 +60,11 @@ router.post('/usuarios', adminAuth, async (req, res) => {
       nome,
       email,
       senha: hashedPassword,
-      tipo_usuario
+      tipo_usuario,
+      gestao,
+      area,
+      equipe,
+      especialidade
     });
     
     res.redirect('/admin/usuarios');
@@ -69,11 +78,18 @@ router.post('/usuarios', adminAuth, async (req, res) => {
 // Update User
 router.post('/usuarios/:id/editar', adminAuth, async (req, res) => {
   try {
-    const { nome, email, tipo_usuario, ativo, senha } = req.body;
+    const { nome, email, tipo_usuario, ativo, senha, gestao, area, equipe, especialidade } = req.body;
+    
+    console.log('DEBUG UPDATE USER - req.body:', req.body);
+    
     const updateData = { 
       nome, 
       email, 
       tipo_usuario,
+      gestao,
+      area,
+      equipe,
+      especialidade,
       ativo: ativo === 'on' || ativo === true || ativo === 'true'
     };
     
@@ -258,7 +274,7 @@ router.get('/lancamentos', adminAuth, async (req, res) => {
     const lancamentos = await Lancamento.findAll({
       where: whereClause,
       include: [
-        { model: User },
+        { model: User, attributes: ['id', 'nome'] },
         { model: Atividade, include: [{ model: Categoria }] }
       ],
       order: [['data', 'DESC'], ['hora_inicio', 'DESC']]
@@ -268,12 +284,12 @@ router.get('/lancamentos', adminAuth, async (req, res) => {
       order: [['nome', 'ASC']]
     });
     
-    res.render('admin/lancamentos', {
+    res.render('admin/lancamentos_improved', {
       user: req.user,
       lancamentos: lancamentos.map(l => l.toJSON()),
       usuarios: usuarios.map(u => u.toJSON()),
-      filtroUserId: user_id || '',
-      filtroData: data || '',
+      filtro_user_id: user_id || '',
+      filtro_data: data || '',
       title: 'Admin Lançamentos - Time Tracking'
     });
     

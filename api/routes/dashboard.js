@@ -5,7 +5,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const { User, Lancamento, Atividade, Categoria } = require('../models/database');
+const { User, Lancamento, Atividade, Categoria, sequelize } = require('../models/database');
 
 const { authenticateToken } = require('./auth');
 
@@ -18,7 +18,7 @@ router.get('/', authenticateToken, (req, res) => {
 router.get('/dashboard', authenticateToken, async (req, res) => {
   try {
     // req.user is already the full user object from middleware
-    console.log('DEBUG DASHBOARD - req.user keys:', Object.keys(req.user));
+    console.log('DEBUG DASHBOARD - req.user:', req.user);
     console.log('DEBUG DASHBOARD - req.user.id:', req.user.id);
     const user = req.user;
     
@@ -26,7 +26,8 @@ router.get('/dashboard', authenticateToken, async (req, res) => {
     const recentLancamentos = await Lancamento.findAll({
       where: { usuario_id: req.user.id },
       include: [
-        { model: Atividade, include: [{ model: Categoria }] }
+        { model: Atividade, include: [{ model: Categoria }] },
+        { model: User, attributes: ['id', 'nome'] }
       ],
       order: [['data', 'DESC'], ['hora_inicio', 'DESC']],
       limit: 10
@@ -34,17 +35,55 @@ router.get('/dashboard', authenticateToken, async (req, res) => {
     
     // Get statistics
     const today = new Date().toISOString().split('T')[0];
+    console.log('DEBUG DASHBOARD - today:', today);
+    
     const todayLancamentos = await Lancamento.findAll({
       where: { 
         usuario_id: req.user.id,
         data: today
-      }
+      },
+      include: [
+        { model: Atividade, include: [{ model: Categoria }] },
+        { model: User, attributes: ['id', 'nome'] }
+      ]
     });
+    
+    console.log('DEBUG DASHBOARD - recentLancamentos.length:', recentLancamentos.length);
+    console.log('DEBUG DASHBOARD - todayLancamentos.length:', todayLancamentos.length);
+    
+    // Calcular horas totais do dia
+    let totalHorasTrabalhadas = 0;
+    
+    todayLancamentos.forEach(lancamento => {
+      totalHorasTrabalhadas += parseFloat(lancamento.horas_trabalhadas || 0);
+    });
+    
+    // Calcular horas pendentes baseado em dias lançados
+    const allLancamentos = await Lancamento.findAll({
+      where: { usuario_id: req.user.id },
+      attributes: [[sequelize.fn('DISTINCT', sequelize.col('data')), 'data']]
+    });
+    
+    const diasLancados = allLancamentos.length;
+    const totalHorasMeta = diasLancados * 9;
+    
+    // Calcular total de horas já trabalhadas em todos os dias
+    const todasHorasTrabalhadas = await Lancamento.findAll({
+      where: { usuario_id: req.user.id },
+      attributes: [[sequelize.fn('SUM', sequelize.col('horas_trabalhadas')), 'total']]
+    });
+    
+    const totalGeralHorasTrabalhadas = parseFloat(todasHorasTrabalhadas[0]?.dataValues.total || 0);
+    const totalHorasPendentes = Math.max(0, totalHorasMeta - totalGeralHorasTrabalhadas);
     
     res.render('dashboard_improved', {
       user: user,
       recentLancamentos: recentLancamentos.map(l => l.toJSON()),
       todayCount: todayLancamentos.length,
+      totalHorasTrabalhadas: totalHorasTrabalhadas.toFixed(2),
+      totalHorasPendentes: totalHorasPendentes.toFixed(2),
+      totalGeralHorasTrabalhadas: totalGeralHorasTrabalhadas.toFixed(2),
+      diasLancados: diasLancados,
       atividades: await Atividade.findAll({ where: { ativo: true }, include: [Categoria] }),
       title: 'Dashboard - Time Tracking'
     });
@@ -72,6 +111,60 @@ router.get('/perfil', authenticateToken, async (req, res) => {
       error: 'Erro ao carregar perfil',
       title: 'Erro - Time Tracking'
     });
+  }
+});
+
+// API para atualizar dashboard em tempo real
+router.get('/api/dashboard-stats', authenticateToken, async (req, res) => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    
+    const todayLancamentos = await Lancamento.findAll({
+      where: { 
+        usuario_id: req.user.id,
+        data: today
+      },
+      include: [
+        { model: Atividade, include: [{ model: Categoria }] },
+        { model: User, attributes: ['id', 'nome'] }
+      ]
+    });
+    
+    // Calcular horas totais do dia
+    let totalHorasTrabalhadas = 0;
+    todayLancamentos.forEach(lancamento => {
+      totalHorasTrabalhadas += parseFloat(lancamento.horas_trabalhadas || 0);
+    });
+    
+    // Calcular horas pendentes baseado em dias lançados
+    const allLancamentos = await Lancamento.findAll({
+      where: { usuario_id: req.user.id },
+      attributes: [[sequelize.fn('DISTINCT', sequelize.col('data')), 'data']]
+    });
+    
+    const diasLancados = allLancamentos.length;
+    const totalHorasMeta = diasLancados * 9;
+    
+    // Calcular total de horas já trabalhadas em todos os dias
+    const todasHorasTrabalhadas = await Lancamento.findAll({
+      where: { usuario_id: req.user.id },
+      attributes: [[sequelize.fn('SUM', sequelize.col('horas_trabalhadas')), 'total']]
+    });
+    
+    const totalGeralHorasTrabalhadas = parseFloat(todasHorasTrabalhadas[0]?.dataValues.total || 0);
+    const totalHorasPendentes = Math.max(0, totalHorasMeta - totalGeralHorasTrabalhadas);
+    
+    res.json({
+      todayCount: todayLancamentos.length,
+      totalHorasTrabalhadas: totalHorasTrabalhadas.toFixed(2),
+      totalHorasPendentes: totalHorasPendentes.toFixed(2),
+      totalGeralHorasTrabalhadas: totalGeralHorasTrabalhadas.toFixed(2),
+      diasLancados: diasLancados,
+      recentLancamentos: todayLancamentos.map(l => l.toJSON())
+    });
+  } catch (error) {
+    console.error('Dashboard stats API error:', error);
+    res.status(500).json({ error: 'Erro ao carregar estatísticas' });
   }
 });
 
@@ -116,15 +209,37 @@ router.get('/lancamentos', authenticateToken, async (req, res) => {
     const lancamentos = await Lancamento.findAll({
       where: whereClause,
       include: [
-        { model: Atividade, include: [{ model: Categoria }] }
+        { model: Atividade, include: [{ model: Categoria }] },
+        { model: User, attributes: ['id', 'nome'] }
       ],
       order: [['data', 'DESC'], ['hora_inicio', 'DESC']]
     });
+    
+    // Calcular estatísticas gerais
+    const allLancamentos = await Lancamento.findAll({
+      where: { usuario_id: req.user.id },
+      attributes: [[sequelize.fn('DISTINCT', sequelize.col('data')), 'data']]
+    });
+    
+    const diasLancados = allLancamentos.length;
+    const totalHorasMeta = diasLancados * 9;
+    
+    // Calcular total de horas já trabalhadas em todos os dias
+    const todasHorasTrabalhadas = await Lancamento.findAll({
+      where: { usuario_id: req.user.id },
+      attributes: [[sequelize.fn('SUM', sequelize.col('horas_trabalhadas')), 'total']]
+    });
+    
+    const totalGeralHorasTrabalhadas = parseFloat(todasHorasTrabalhadas[0]?.dataValues.total || 0);
+    const totalHorasPendentes = Math.max(0, totalHorasMeta - totalGeralHorasTrabalhadas);
     
     res.render('lancamentos', {
       user: req.user,
       lancamentos: lancamentos.map(l => l.toJSON()),
       filtroData: data || '',
+      totalGeralHorasTrabalhadas: totalGeralHorasTrabalhadas,
+      totalHorasPendentes: totalHorasPendentes,
+      diasLancados: diasLancados,
       title: 'Meus Lançamentos - Time Tracking',
       atividades: await Atividade.findAll({ where: { ativo: true }, include: [Categoria] })
     });
@@ -141,12 +256,27 @@ router.get('/lancamentos', authenticateToken, async (req, res) => {
 router.post('/novo-lancamento', authenticateToken, async (req, res) => {
   try {
     const { atividade_id, data, hora_inicio, hora_fim, descricao } = req.body;
+    
+    // Calcular horas trabalhadas
+    let horasTrabalhadas = 0;
+    let horasPendentes = 9; // Meta diária de 9 horas
+    
+    if (hora_fim) {
+      const inicio = new Date(`2000-01-01T${hora_inicio}`);
+      const fim = new Date(`2000-01-01T${hora_fim}`);
+      const diffMs = fim - inicio;
+      horasTrabalhadas = diffMs / (1000 * 60 * 60);
+      horasPendentes = Math.max(0, 9 - horasTrabalhadas);
+    }
+    
     await Lancamento.create({
       usuario_id: req.user.id,
       atividade_id,
       data,
       hora_inicio,
       hora_fim,
+      horas_trabalhadas: horasTrabalhadas,
+      horas_pendentes: horasPendentes,
       descricao
     });
     res.redirect(req.headers.referer || '/dashboard');
@@ -160,11 +290,26 @@ router.post('/novo-lancamento', authenticateToken, async (req, res) => {
 router.post('/editar-lancamento/:id', authenticateToken, async (req, res) => {
   try {
     const { atividade_id, data, hora_inicio, hora_fim, descricao } = req.body;
+    
+    // Calcular horas trabalhadas
+    let horasTrabalhadas = 0;
+    let horasPendentes = 9; // Meta diária de 9 horas
+    
+    if (hora_fim) {
+      const inicio = new Date(`2000-01-01T${hora_inicio}`);
+      const fim = new Date(`2000-01-01T${hora_fim}`);
+      const diffMs = fim - inicio;
+      horasTrabalhadas = diffMs / (1000 * 60 * 60);
+      horasPendentes = Math.max(0, 9 - horasTrabalhadas);
+    }
+    
     await Lancamento.update({
       atividade_id,
       data,
       hora_inicio,
       hora_fim,
+      horas_trabalhadas: horasTrabalhadas,
+      horas_pendentes: horasPendentes,
       descricao
     }, {
       where: { 

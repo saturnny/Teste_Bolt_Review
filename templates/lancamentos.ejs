@@ -34,7 +34,7 @@
             <i class="bi bi-clipboard-data"></i>
         </div>
         <div class="stat-content">
-            <div class="stat-value" id="total-lancamentos">0</div>
+            <div class="stat-value" id="total-lancamentos"><%= typeof lancamentos !== 'undefined' ? lancamentos.length : 0 %></div>
             <div class="stat-label">Total de Lançamentos</div>
         </div>
     </div>
@@ -44,7 +44,17 @@
             <i class="bi bi-clock"></i>
         </div>
         <div class="stat-content">
-            <div class="stat-value" id="total-horas">0.0</div>
+            <div class="stat-value" id="total-horas">
+                <% if (typeof totalGeralHorasTrabalhadas !== 'undefined') { %>
+                    <% 
+                        const hours = Math.floor(parseFloat(totalGeralHorasTrabalhadas));
+                        const minutes = Math.round((parseFloat(totalGeralHorasTrabalhadas) - hours) * 60);
+                    %>
+                    <%= hours %>h <%= minutes %>m
+                <% } else { %>
+                    0h 0m
+                <% } %>
+            </div>
             <div class="stat-label">Horas Totais</div>
         </div>
     </div>
@@ -54,7 +64,17 @@
             <i class="bi bi-clock-history"></i>
         </div>
         <div class="stat-content">
-            <div class="stat-value" id="horas-pendentes">0.0</div>
+            <div class="stat-value" id="horas-pendentes">
+                <% if (typeof totalHorasPendentes !== 'undefined') { %>
+                    <% 
+                        const hours = Math.floor(parseFloat(totalHorasPendentes));
+                        const minutes = Math.round((parseFloat(totalHorasPendentes) - hours) * 60);
+                    %>
+                    <%= hours %>h <%= minutes %>m
+                <% } else { %>
+                    0h 0m
+                <% } %>
+            </div>
             <div class="stat-label">Horas Pendentes</div>
         </div>
     </div>
@@ -98,7 +118,7 @@
                         </div>
                     </td>
                     <td>
-                        <span class="badge bg-success"><%= (lancamento.duracao_horas || 0).toFixed(1) %>h</span>
+                        <span class="badge bg-success"><%= parseFloat(lancamento.horas_trabalhadas || 0).toFixed(1) %>h</span>
                     </td>
                     <td>
                         <div class="btn-group" role="group">
@@ -111,7 +131,7 @@
                                    data-inicio="<%= lancamento.hora_inicio %>"
                                    data-fim="<%= lancamento.hora_fim %>"
                                    data-atividade="<%= (lancamento.Atividade) ? lancamento.Atividade.id : (lancamento.atividade ? lancamento.atividade.id : '') %>"
-                                   data-observacao="<%= lancamento.observacao || '' %>"
+                                   data-observacao="<%= lancamento.descricao || '' %>"
                                    onclick="openEditModal('<%= lancamento.id %>')">
                                 <i class="bi bi-pencil"></i>
                             </button>
@@ -923,5 +943,12 @@ function showNotification(message, type = 'info') {
         }, false);
     });
 })();
+
+// Função para converter horas decimais para formato Xh Ym
+function formatHoursToHM(decimalHours) {
+    const hours = Math.floor(decimalHours);
+    const minutes = Math.round((decimalHours - hours) * 60);
+    return `${hours}h ${minutes}m`;
+}
 </script>
 

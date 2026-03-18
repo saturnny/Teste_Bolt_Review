@@ -3,7 +3,7 @@
  * Create initial data for testing
  */
 const bcrypt = require('bcryptjs');
-const { sequelize, User, Categoria, Atividade } = require('./models/database');
+const { sequelize, User, Categoria, Atividade, Lancamento } = require('./api/models/database');
 
 async function seedDatabase() {
   try {
@@ -36,6 +36,23 @@ async function seedDatabase() {
         email: 'user@teste.com',
         senha: hashedUserPassword,
         tipo_usuario: 'Usuário'
+      });
+
+      // Create additional test users
+      const hashedUserPassword2 = await bcrypt.hash('user456', 10);
+      await User.create({
+        nome: 'João Silva',
+        email: 'joao@empresa.com',
+        senha: hashedUserPassword2,
+        tipo_usuario: 'Usuário'
+      });
+
+      const hashedAdminPassword2 = await bcrypt.hash('admin456', 10);
+      await User.create({
+        nome: 'Maria Souza',
+        email: 'maria@empresa.com',
+        senha: hashedAdminPassword2,
+        tipo_usuario: 'Admin'
       });
 
       console.log('Users created successfully.');
